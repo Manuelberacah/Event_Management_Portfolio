@@ -351,11 +351,13 @@
   @media (max-width:480px){ .mehendi-grid{ grid-template-columns:repeat(2, 1fr); gap:12px; } }
   .mehendi-item{
     background:var(--ink-2); border:1px solid var(--line); border-radius:var(--radius);
-    overflow:hidden; margin:0;
+    overflow:hidden; margin:0; cursor:pointer;
   }
   .mehendi-item img{
-    width:100%; aspect-ratio:1/1; object-fit:cover; display:block;
+    width:100%; aspect-ratio:3/4; object-fit:contain; object-position:center;
+    background:var(--ink); display:block; transition:transform 0.25s ease;
   }
+  .mehendi-item:hover img{ transform:scale(1.03); }
   .mehendi-item figcaption{
     font-family:var(--mono); font-size:11px; color:var(--grey);
     padding:12px 14px; letter-spacing:0.03em;
@@ -364,6 +366,29 @@
     font-family:var(--mono); font-size:13px; color:var(--grey-dim);
     border:1px dashed var(--line); border-radius:var(--radius);
     padding:40px; text-align:center; letter-spacing:0.04em;
+  }
+  .mehendi-lightbox{
+    position:fixed; inset:0; z-index:1000;
+    background:rgba(20,21,31,0.94);
+    display:flex; align-items:center; justify-content:center;
+    padding:40px 24px;
+    opacity:0; pointer-events:none; transition:opacity 0.2s ease;
+  }
+  .mehendi-lightbox.is-open{ opacity:1; pointer-events:auto; }
+  .mehendi-lightbox img{
+    max-width:min(90vw, 700px); max-height:85vh; object-fit:contain;
+    border-radius:var(--radius); box-shadow:0 30px 70px -20px rgba(0,0,0,0.7);
+  }
+  .mehendi-lightbox-close{
+    position:absolute; top:20px; right:24px;
+    font-family:var(--mono); font-size:13px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--paper); background:transparent; border:1px solid var(--line);
+    border-radius:var(--radius); padding:9px 16px; cursor:pointer;
+  }
+  .mehendi-lightbox-close:hover{ color:var(--amber); border-color:var(--amber); }
+  @media (max-width:480px){
+    .mehendi-lightbox{ padding:20px 14px; }
+    .mehendi-lightbox-close{ top:12px; right:12px; font-size:11px; padding:7px 12px; }
   }
 
   /* ---------- BEYOND THE VENUE ---------- */
@@ -637,6 +662,11 @@
   </div>
 </section>
 
+<div class="mehendi-lightbox" id="mehendiLightbox">
+  <button class="mehendi-lightbox-close" id="mehendiLightboxClose">Close ✕</button>
+  <img id="mehendiLightboxImg" src="" alt="Mehendi design, enlarged">
+</div>
+
 <section id="beyond">
   <div class="wrap">
     <div class="section-head">
@@ -753,11 +783,38 @@
     }
     grid.innerHTML = mehendiDesigns.map(function(d){
       const caption = d.caption ? '<figcaption>' + d.caption + '</figcaption>' : '';
-      return '<figure class="mehendi-item">' +
+      return '<figure class="mehendi-item" data-full="' + d.image + '" data-caption="' + (d.caption || '') + '">' +
                '<img src="' + d.image + '" alt="' + (d.caption || 'Mehendi design') + '" loading="lazy">' +
                caption +
              '</figure>';
     }).join('');
+
+    const lightbox = document.getElementById('mehendiLightbox');
+    const lightboxImg = document.getElementById('mehendiLightboxImg');
+    const lightboxClose = document.getElementById('mehendiLightboxClose');
+
+    function openLightbox(src, alt){
+      lightboxImg.src = src;
+      lightboxImg.alt = alt || 'Mehendi design, enlarged';
+      lightbox.classList.add('is-open');
+    }
+    function closeLightbox(){
+      lightbox.classList.remove('is-open');
+      lightboxImg.src = '';
+    }
+
+    grid.querySelectorAll('.mehendi-item').forEach(function(item){
+      item.addEventListener('click', function(){
+        openLightbox(item.getAttribute('data-full'), item.getAttribute('data-caption'));
+      });
+    });
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', function(e){
+      if (e.target === lightbox) closeLightbox();
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeLightbox();
+    });
   }
   renderMehendiGallery();
 </script>
