@@ -347,16 +347,18 @@
   .side-stage-grid{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:20px; }
   @media (max-width:650px){ .side-stage-grid{ grid-template-columns:1fr; } }
   .mehendi-launcher{
-    display:flex; align-items:center; justify-content:space-between; gap:24px;
-    background:var(--ink-2); border:1px solid var(--line); border-radius:var(--radius);
-    padding:28px 32px; cursor:pointer; text-align:left; width:100%;
-    color:var(--paper); transition:border-color 0.2s ease, transform 0.2s ease;
+    display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-start; gap:0;
+    background:var(--ink-2); border:1px solid var(--line); border-radius:0;
+    min-height:299px; padding:46px 38px 42px; cursor:pointer; text-align:left; width:100%;
+    color:var(--paper); transition:border-color 0.2s ease, background 0.2s ease;
   }
-  .mehendi-launcher:hover{ border-color:var(--amber); transform:translateY(-2px); }
-  .mehendi-launcher-copy{ display:flex; flex-direction:column; gap:8px; }
-  .mehendi-launcher-title{ font-family:var(--display); font-size:clamp(1.7rem, 4vw, 2.8rem); text-transform:uppercase; line-height:1; }
-  .mehendi-launcher-meta{ font-family:var(--mono); font-size:11px; color:var(--grey); letter-spacing:0.08em; text-transform:uppercase; }
-  .mehendi-launcher-arrow{ color:var(--amber); font-family:var(--mono); font-size:24px; }
+  .mehendi-launcher:hover{ border-color:var(--amber); background:var(--ink-2); }
+  .mehendi-launcher-copy{ display:flex; flex-direction:column; align-items:flex-start; gap:0; width:100%; }
+  .mehendi-launcher-copy::before{ content:'Gallery'; font-family:var(--mono); font-size:12px; color:var(--marquee-red); letter-spacing:0.16em; text-transform:uppercase; margin-bottom:26px; }
+  .mehendi-launcher-title{ font-family:var(--display); font-size:clamp(1.65rem, 3vw, 2.15rem); color:var(--paper); text-transform:uppercase; line-height:1; letter-spacing:-0.035em; }
+  .mehendi-launcher-meta{ max-width:380px; margin-top:26px; font-family:var(--sans); font-size:1.03rem; line-height:1.55; color:var(--grey); letter-spacing:0; text-transform:none; }
+  .mehendi-launcher-meta::after{ content:'  →'; color:var(--amber); font-family:var(--mono); letter-spacing:0.05em; }
+  .mehendi-launcher-arrow{ display:none; }
   .mehendi-empty{ font-family:var(--mono); font-size:13px; color:var(--grey-dim); border:1px dashed var(--line); border-radius:var(--radius); padding:40px; text-align:center; letter-spacing:0.04em; }
   .mehendi-lightbox{ position:fixed; inset:0; z-index:1000; background:rgba(20,21,31,0.96); display:flex; align-items:center; justify-content:center; padding:72px 80px 40px; opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
   .mehendi-lightbox.is-open{ opacity:1; pointer-events:auto; }
@@ -640,14 +642,14 @@
     <button class="mehendi-launcher" id="mehendiLauncher" type="button" aria-haspopup="dialog">
       <span class="mehendi-launcher-copy">
         <span class="mehendi-launcher-title">Mehendi Designs</span>
-        <span class="mehendi-launcher-meta">11 designs · Open gallery</span>
+        <span class="mehendi-launcher-meta">Custom mehendi work for weddings, celebrations, and special occasions.</span>
       </span>
       <span class="mehendi-launcher-arrow" aria-hidden="true">→</span>
     </button>
     <button class="mehendi-launcher" id="creativeLauncher" type="button" aria-haspopup="dialog">
       <span class="mehendi-launcher-copy">
         <span class="mehendi-launcher-title">Creative Works</span>
-        <span class="mehendi-launcher-meta">Visual concepts · Open gallery</span>
+        <span class="mehendi-launcher-meta">Design, styling, and visual work outside event coordination.</span>
       </span>
       <span class="mehendi-launcher-arrow" aria-hidden="true">→</span>
     </button>
