@@ -344,52 +344,28 @@
   }
 
   /* ---------- MEHENDI GALLERY ---------- */
-  .mehendi-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:20px;
-  }
-  @media (max-width:800px){ .mehendi-grid{ grid-template-columns:repeat(2, 1fr); } }
-  @media (max-width:480px){ .mehendi-grid{ grid-template-columns:repeat(2, 1fr); gap:12px; } }
-  .mehendi-item{
+  .mehendi-launcher{
+    display:flex; align-items:center; justify-content:space-between; gap:24px;
     background:var(--ink-2); border:1px solid var(--line); border-radius:var(--radius);
-    overflow:hidden; margin:0; cursor:pointer;
+    padding:28px 32px; cursor:pointer; text-align:left; width:100%;
+    color:var(--paper); transition:border-color 0.2s ease, transform 0.2s ease;
   }
-  .mehendi-item img{
-    width:100%; aspect-ratio:3/4; object-fit:contain; object-position:center;
-    background:var(--ink); display:block; transition:transform 0.25s ease;
-  }
-  .mehendi-item:hover img{ transform:scale(1.03); }
-  .mehendi-item figcaption{
-    font-family:var(--mono); font-size:11px; color:var(--grey);
-    padding:12px 14px; letter-spacing:0.03em;
-  }
-  .mehendi-empty{
-    font-family:var(--mono); font-size:13px; color:var(--grey-dim);
-    border:1px dashed var(--line); border-radius:var(--radius);
-    padding:40px; text-align:center; letter-spacing:0.04em;
-  }
-  .mehendi-lightbox{
-    position:fixed; inset:0; z-index:1000;
-    background:rgba(20,21,31,0.94);
-    display:flex; align-items:center; justify-content:center;
-    padding:40px 24px;
-    opacity:0; pointer-events:none; transition:opacity 0.2s ease;
-  }
+  .mehendi-launcher:hover{ border-color:var(--amber); transform:translateY(-2px); }
+  .mehendi-launcher-copy{ display:flex; flex-direction:column; gap:8px; }
+  .mehendi-launcher-title{ font-family:var(--display); font-size:clamp(1.7rem, 4vw, 2.8rem); text-transform:uppercase; line-height:1; }
+  .mehendi-launcher-meta{ font-family:var(--mono); font-size:11px; color:var(--grey); letter-spacing:0.08em; text-transform:uppercase; }
+  .mehendi-launcher-arrow{ color:var(--amber); font-family:var(--mono); font-size:24px; }
+  .mehendi-empty{ font-family:var(--mono); font-size:13px; color:var(--grey-dim); border:1px dashed var(--line); border-radius:var(--radius); padding:40px; text-align:center; letter-spacing:0.04em; }
+  .mehendi-lightbox{ position:fixed; inset:0; z-index:1000; background:rgba(20,21,31,0.96); display:flex; align-items:center; justify-content:center; padding:72px 80px 40px; opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
   .mehendi-lightbox.is-open{ opacity:1; pointer-events:auto; }
-  .mehendi-lightbox img{
-    max-width:min(90vw, 700px); max-height:85vh; object-fit:contain;
-    border-radius:var(--radius); box-shadow:0 30px 70px -20px rgba(0,0,0,0.7);
-  }
-  .mehendi-lightbox-close{
-    position:absolute; top:20px; right:24px;
-    font-family:var(--mono); font-size:13px; letter-spacing:0.08em; text-transform:uppercase;
-    color:var(--paper); background:transparent; border:1px solid var(--line);
-    border-radius:var(--radius); padding:9px 16px; cursor:pointer;
-  }
-  .mehendi-lightbox-close:hover{ color:var(--amber); border-color:var(--amber); }
-  @media (max-width:480px){
-    .mehendi-lightbox{ padding:20px 14px; }
-    .mehendi-lightbox-close{ top:12px; right:12px; font-size:11px; padding:7px 12px; }
-  }
+  .mehendi-carousel{ display:flex; flex-direction:column; align-items:center; gap:16px; max-width:850px; width:100%; }
+  .mehendi-lightbox img{ max-width:100%; max-height:72vh; object-fit:contain; border-radius:var(--radius); box-shadow:0 30px 70px -20px rgba(0,0,0,0.7); }
+  .mehendi-carousel-caption{ font-family:var(--mono); font-size:11px; color:var(--grey); letter-spacing:0.08em; text-transform:uppercase; }
+  .mehendi-carousel-controls{ display:flex; align-items:center; gap:18px; }
+  .mehendi-carousel-btn,.mehendi-lightbox-close{ font-family:var(--mono); font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--paper); background:transparent; border:1px solid var(--line); border-radius:var(--radius); padding:9px 16px; cursor:pointer; }
+  .mehendi-carousel-btn:hover,.mehendi-lightbox-close:hover{ color:var(--amber); border-color:var(--amber); }
+  .mehendi-lightbox-close{ position:absolute; top:20px; right:24px; }
+  @media (max-width:480px){ .mehendi-launcher{ padding:22px; } .mehendi-lightbox{ padding:64px 14px 24px; } .mehendi-lightbox-close{ top:12px; right:12px; font-size:11px; padding:7px 12px; } .mehendi-carousel-btn{ padding:8px 12px; } }
 
   /* ---------- BEYOND THE VENUE ---------- */
   .side-grid{ display:grid; grid-template-columns:1fr 1fr; gap:32px; }
@@ -658,13 +634,27 @@
       <h2 class="section-title">Mehendi Designs</h2>
       <span class="section-sub">A Look at the Work</span>
     </div>
-    <div class="mehendi-grid" id="mehendiGrid"></div>
+    <button class="mehendi-launcher" id="mehendiLauncher" type="button" aria-haspopup="dialog">
+      <span class="mehendi-launcher-copy">
+        <span class="mehendi-launcher-title">View the collection</span>
+        <span class="mehendi-launcher-meta">11 designs · Open gallery</span>
+      </span>
+      <span class="mehendi-launcher-arrow" aria-hidden="true">→</span>
+    </button>
   </div>
 </section>
 
-<div class="mehendi-lightbox" id="mehendiLightbox">
-  <button class="mehendi-lightbox-close" id="mehendiLightboxClose">Close ✕</button>
-  <img id="mehendiLightboxImg" src="" alt="Mehendi design, enlarged">
+<div class="mehendi-lightbox" id="mehendiLightbox" role="dialog" aria-modal="true" aria-label="Mehendi designs gallery">
+  <button class="mehendi-lightbox-close" id="mehendiLightboxClose" type="button">Close ×</button>
+  <div class="mehendi-carousel">
+    <img id="mehendiLightboxImg" src="" alt="Mehendi design, enlarged">
+    <div class="mehendi-carousel-caption" id="mehendiCarouselCaption"></div>
+    <div class="mehendi-carousel-controls">
+      <button class="mehendi-carousel-btn" id="mehendiPrev" type="button" aria-label="Previous design">← Prev</button>
+      <span class="mehendi-carousel-caption" id="mehendiCarouselCount"></span>
+      <button class="mehendi-carousel-btn" id="mehendiNext" type="button" aria-label="Next design">Next →</button>
+    </div>
+  </div>
 </div>
 
 <section id="beyond">
@@ -775,45 +765,48 @@
   ];
 
   function renderMehendiGallery(){
-    const grid = document.getElementById('mehendiGrid');
-    if (!grid) return;
-    if (!mehendiDesigns.length){
-      grid.innerHTML = '<p class="mehendi-empty">Designs coming soon.</p>';
-      return;
-    }
-    grid.innerHTML = mehendiDesigns.map(function(d){
-      const caption = d.caption ? '<figcaption>' + d.caption + '</figcaption>' : '';
-      return '<figure class="mehendi-item" data-full="' + d.image + '" data-caption="' + (d.caption || '') + '">' +
-               '<img src="' + d.image + '" alt="' + (d.caption || 'Mehendi design') + '" loading="lazy">' +
-               caption +
-             '</figure>';
-    }).join('');
-
+    const launcher = document.getElementById('mehendiLauncher');
     const lightbox = document.getElementById('mehendiLightbox');
     const lightboxImg = document.getElementById('mehendiLightboxImg');
     const lightboxClose = document.getElementById('mehendiLightboxClose');
+    const caption = document.getElementById('mehendiCarouselCaption');
+    const count = document.getElementById('mehendiCarouselCount');
+    const prev = document.getElementById('mehendiPrev');
+    const next = document.getElementById('mehendiNext');
+    if (!launcher || !lightbox || !mehendiDesigns.length) return;
+    let currentIndex = 0;
 
-    function openLightbox(src, alt){
-      lightboxImg.src = src;
-      lightboxImg.alt = alt || 'Mehendi design, enlarged';
+    function showDesign(index){
+      currentIndex = (index + mehendiDesigns.length) % mehendiDesigns.length;
+      const design = mehendiDesigns[currentIndex];
+      lightboxImg.src = design.image;
+      lightboxImg.alt = design.caption || 'Mehendi design, enlarged';
+      caption.textContent = design.caption || 'Mehendi design';
+      count.textContent = (currentIndex + 1) + ' / ' + mehendiDesigns.length;
+    }
+    function openLightbox(){
+      showDesign(0);
       lightbox.classList.add('is-open');
+      document.body.style.overflow = 'hidden';
     }
     function closeLightbox(){
       lightbox.classList.remove('is-open');
       lightboxImg.src = '';
+      document.body.style.overflow = '';
     }
 
-    grid.querySelectorAll('.mehendi-item').forEach(function(item){
-      item.addEventListener('click', function(){
-        openLightbox(item.getAttribute('data-full'), item.getAttribute('data-caption'));
-      });
-    });
+    launcher.addEventListener('click', openLightbox);
+    prev.addEventListener('click', function(){ showDesign(currentIndex - 1); });
+    next.addEventListener('click', function(){ showDesign(currentIndex + 1); });
     lightboxClose.addEventListener('click', closeLightbox);
     lightbox.addEventListener('click', function(e){
       if (e.target === lightbox) closeLightbox();
     });
     document.addEventListener('keydown', function(e){
+      if (!lightbox.classList.contains('is-open')) return;
       if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showDesign(currentIndex - 1);
+      if (e.key === 'ArrowRight') showDesign(currentIndex + 1);
     });
   }
   renderMehendiGallery();
