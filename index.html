@@ -344,6 +344,8 @@
   }
 
   /* ---------- MEHENDI GALLERY ---------- */
+  .side-stage-grid{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:20px; }
+  @media (max-width:650px){ .side-stage-grid{ grid-template-columns:1fr; } }
   .mehendi-launcher{
     display:flex; align-items:center; justify-content:space-between; gap:24px;
     background:var(--ink-2); border:1px solid var(--line); border-radius:var(--radius);
@@ -441,7 +443,7 @@
       <li><a href="#about">About</a></li>
       <li><a href="#runofshow">Run of Show</a></li>
       <li><a href="#skills">Skills</a></li>
-      <li><a href="#mehendi">Mehendi</a></li>
+      <li><a href="#sidestage">Side Stage</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </div>
@@ -627,34 +629,39 @@
   </div>
 </section>
 
-<section id="mehendi">
+<section id="sidestage">
   <div class="wrap">
-    <div class="section-head">
-      <span class="section-num">04</span>
-      <h2 class="section-title">Mehendi Designs</h2>
-      <span class="section-sub">A Look at the Work</span>
-    </div>
+  <div class="section-head">
+  <span class="section-num">04</span>
+  <h2 class="section-title">Side Stage</h2>
+  <span class="section-sub">Creative Work Off-Script</span>
+  </div>
+  <div class="side-stage-grid">
     <button class="mehendi-launcher" id="mehendiLauncher" type="button" aria-haspopup="dialog">
       <span class="mehendi-launcher-copy">
-        <span class="mehendi-launcher-title">View the collection</span>
+        <span class="mehendi-launcher-title">Mehendi Designs</span>
         <span class="mehendi-launcher-meta">11 designs · Open gallery</span>
       </span>
       <span class="mehendi-launcher-arrow" aria-hidden="true">→</span>
     </button>
+    <button class="mehendi-launcher" id="creativeLauncher" type="button" aria-haspopup="dialog">
+      <span class="mehendi-launcher-copy">
+        <span class="mehendi-launcher-title">Creative Works</span>
+        <span class="mehendi-launcher-meta">Visual concepts · Open gallery</span>
+      </span>
+      <span class="mehendi-launcher-arrow" aria-hidden="true">→</span>
+    </button>
+  </div>
   </div>
 </section>
 
 <div class="mehendi-lightbox" id="mehendiLightbox" role="dialog" aria-modal="true" aria-label="Mehendi designs gallery">
   <button class="mehendi-lightbox-close" id="mehendiLightboxClose" type="button">Close ×</button>
-  <div class="mehendi-carousel">
-    <img id="mehendiLightboxImg" src="" alt="Mehendi design, enlarged">
-    <div class="mehendi-carousel-caption" id="mehendiCarouselCaption"></div>
-    <div class="mehendi-carousel-controls">
-      <button class="mehendi-carousel-btn" id="mehendiPrev" type="button" aria-label="Previous design">← Prev</button>
-      <span class="mehendi-carousel-caption" id="mehendiCarouselCount"></span>
-      <button class="mehendi-carousel-btn" id="mehendiNext" type="button" aria-label="Next design">Next →</button>
-    </div>
-  </div>
+  <div class="mehendi-carousel"><img id="mehendiLightboxImg" src="" alt="Mehendi design, enlarged"><div class="mehendi-carousel-caption" id="mehendiCarouselCaption"></div><div class="mehendi-carousel-controls"><button class="mehendi-carousel-btn" id="mehendiPrev" type="button" aria-label="Previous design">← Prev</button><span class="mehendi-carousel-caption" id="mehendiCarouselCount"></span><button class="mehendi-carousel-btn" id="mehendiNext" type="button" aria-label="Next design">Next →</button></div></div>
+</div>
+<div class="mehendi-lightbox" id="creativeLightbox" role="dialog" aria-modal="true" aria-label="Creative works gallery">
+  <button class="mehendi-lightbox-close" id="creativeLightboxClose" type="button">Close ×</button>
+  <div class="mehendi-carousel"><img id="creativeLightboxImg" src="" alt="Creative work, enlarged"><div class="mehendi-carousel-caption" id="creativeCarouselCaption"></div><div class="mehendi-carousel-controls"><button class="mehendi-carousel-btn" id="creativePrev" type="button" aria-label="Previous creative work">← Prev</button><span class="mehendi-carousel-caption" id="creativeCarouselCount"></span><button class="mehendi-carousel-btn" id="creativeNext" type="button" aria-label="Next creative work">Next →</button></div></div>
 </div>
 
 <section id="beyond">
@@ -731,11 +738,12 @@
 
 <!--
   ============================================================
-  MEHENDI GALLERY — EDIT THIS LIST TO ADD OR REMOVE DESIGNS
-  ============================================================
+  SIDE STAGE GALLERIES — EDIT THESE LISTS TO ADD OR REMOVE WORKS
+  ================================================================
   HOW TO ADD A PHOTO:
-    1. Upload your image file into the "mehendi" folder in this
-       same repo (Add file -> Upload files on github.com).
+    1. Upload mehendi images into the "mehendi" folder or creative
+       work images into the "creative" folder in this same repo
+       (Add file -> Upload files on github.com).
     2. Copy one line below, paste it into the list, and change:
          image   -> "mehendi/yourfilename.jpg" (exact file name)
          caption -> a short caption, or "" for no caption
@@ -764,52 +772,54 @@
     { image: "mehendi/ff6a3f2c-6bbe-42b4-ab48-2fea6055d6e0.jpg", caption: "" },
   ];
 
-  function renderMehendiGallery(){
-    const launcher = document.getElementById('mehendiLauncher');
-    const lightbox = document.getElementById('mehendiLightbox');
-    const lightboxImg = document.getElementById('mehendiLightboxImg');
-    const lightboxClose = document.getElementById('mehendiLightboxClose');
-    const caption = document.getElementById('mehendiCarouselCaption');
-    const count = document.getElementById('mehendiCarouselCount');
-    const prev = document.getElementById('mehendiPrev');
-    const next = document.getElementById('mehendiNext');
-    if (!launcher || !lightbox || !mehendiDesigns.length) return;
+  const creativeWorks = [
+    // { image: "creative/your-file.jpg", caption: "Creative concept" },
+  ];
+
+  function setupGallery(config){
+    const launcher = document.getElementById(config.launcher);
+    const lightbox = document.getElementById(config.lightbox);
+    if (!launcher || !lightbox) return;
+    const image = document.getElementById(config.image);
+    const close = document.getElementById(config.close);
+    const caption = document.getElementById(config.caption);
+    const count = document.getElementById(config.count);
+    const prev = document.getElementById(config.prev);
+    const next = document.getElementById(config.next);
     let currentIndex = 0;
-
-    function showDesign(index){
-      currentIndex = (index + mehendiDesigns.length) % mehendiDesigns.length;
-      const design = mehendiDesigns[currentIndex];
-      lightboxImg.src = design.image;
-      lightboxImg.alt = design.caption || 'Mehendi design, enlarged';
-      caption.textContent = design.caption || 'Mehendi design';
-      count.textContent = (currentIndex + 1) + ' / ' + mehendiDesigns.length;
+    function show(index){
+      if (!config.items.length){
+        image.removeAttribute('src');
+        image.alt = '';
+        image.style.display = 'none';
+        caption.textContent = 'Images coming soon — add them to the creative folder.';
+        count.textContent = '0 / 0';
+        return;
+      }
+      image.style.display = '';
+      currentIndex = (index + config.items.length) % config.items.length;
+      const item = config.items[currentIndex];
+      image.src = item.image;
+      image.alt = item.caption || config.alt;
+      caption.textContent = item.caption || config.alt;
+      count.textContent = (currentIndex + 1) + ' / ' + config.items.length;
     }
-    function openLightbox(){
-      showDesign(0);
-      lightbox.classList.add('is-open');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeLightbox(){
-      lightbox.classList.remove('is-open');
-      lightboxImg.src = '';
-      document.body.style.overflow = '';
-    }
-
-    launcher.addEventListener('click', openLightbox);
-    prev.addEventListener('click', function(){ showDesign(currentIndex - 1); });
-    next.addEventListener('click', function(){ showDesign(currentIndex + 1); });
-    lightboxClose.addEventListener('click', closeLightbox);
-    lightbox.addEventListener('click', function(e){
-      if (e.target === lightbox) closeLightbox();
-    });
+    function open(){ show(0); lightbox.classList.add('is-open'); document.body.style.overflow = 'hidden'; }
+    function dismiss(){ lightbox.classList.remove('is-open'); image.src = ''; document.body.style.overflow = ''; }
+    launcher.addEventListener('click', open);
+    prev.addEventListener('click', function(){ show(currentIndex - 1); });
+    next.addEventListener('click', function(){ show(currentIndex + 1); });
+    close.addEventListener('click', dismiss);
+    lightbox.addEventListener('click', function(e){ if (e.target === lightbox) dismiss(); });
     document.addEventListener('keydown', function(e){
       if (!lightbox.classList.contains('is-open')) return;
-      if (e.key === 'Escape') closeLightbox();
-      if (e.key === 'ArrowLeft') showDesign(currentIndex - 1);
-      if (e.key === 'ArrowRight') showDesign(currentIndex + 1);
+      if (e.key === 'Escape') dismiss();
+      if (e.key === 'ArrowLeft') show(currentIndex - 1);
+      if (e.key === 'ArrowRight') show(currentIndex + 1);
     });
   }
-  renderMehendiGallery();
+  setupGallery({ launcher:'mehendiLauncher', lightbox:'mehendiLightbox', image:'mehendiLightboxImg', close:'mehendiLightboxClose', caption:'mehendiCarouselCaption', count:'mehendiCarouselCount', prev:'mehendiPrev', next:'mehendiNext', items:mehendiDesigns, alt:'Mehendi design' });
+  setupGallery({ launcher:'creativeLauncher', lightbox:'creativeLightbox', image:'creativeLightboxImg', close:'creativeLightboxClose', caption:'creativeCarouselCaption', count:'creativeCarouselCount', prev:'creativePrev', next:'creativeNext', items:creativeWorks, alt:'Creative work' });
 </script>
 
 </body>
