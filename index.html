@@ -360,6 +360,13 @@
   .mehendi-launcher-meta::after{ content:'  →'; color:var(--amber); font-family:var(--mono); letter-spacing:0.05em; }
   .mehendi-launcher-arrow{ display:none; }
   .mehendi-empty{ font-family:var(--mono); font-size:13px; color:var(--grey-dim); border:1px dashed var(--line); border-radius:var(--radius); padding:40px; text-align:center; letter-spacing:0.04em; }
+  .creative-gallery{ display:none; margin-top:28px; }
+  .creative-gallery.is-visible{ display:block; }
+  .creative-gallery-grid{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; }
+  .creative-gallery-item{ background:var(--ink-2); border:1px solid var(--line); padding:0; overflow:hidden; }
+  .creative-gallery-item img{ width:100%; aspect-ratio:1 / 1; object-fit:cover; transition:transform 0.25s ease; }
+  .creative-gallery-item:hover img{ transform:scale(1.03); }
+  .creative-gallery-caption{ padding:12px 14px; font-family:var(--mono); font-size:10px; color:var(--grey); letter-spacing:0.06em; text-transform:uppercase; }
   .mehendi-lightbox{ position:fixed; inset:0; z-index:1000; background:rgba(20,21,31,0.96); display:flex; align-items:center; justify-content:center; padding:72px 80px 40px; opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
   .mehendi-lightbox.is-open{ opacity:1; pointer-events:auto; }
   .mehendi-carousel{ display:flex; flex-direction:column; align-items:center; gap:16px; max-width:850px; width:100%; }
@@ -369,7 +376,8 @@
   .mehendi-carousel-btn,.mehendi-lightbox-close{ font-family:var(--mono); font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--paper); background:transparent; border:1px solid var(--line); border-radius:var(--radius); padding:9px 16px; cursor:pointer; }
   .mehendi-carousel-btn:hover,.mehendi-lightbox-close:hover{ color:var(--amber); border-color:var(--amber); }
   .mehendi-lightbox-close{ position:absolute; top:20px; right:24px; }
-  @media (max-width:480px){ .mehendi-launcher{ padding:22px; } .mehendi-lightbox{ padding:64px 14px 24px; } .mehendi-lightbox-close{ top:12px; right:12px; font-size:11px; padding:7px 12px; } .mehendi-carousel-btn{ padding:8px 12px; } }
+  @media (max-width:650px){ .creative-gallery-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+  @media (max-width:480px){ .mehendi-launcher{ padding:22px; } .creative-gallery-grid{ grid-template-columns:1fr; } .mehendi-lightbox{ padding:64px 14px 24px; } .mehendi-lightbox-close{ top:12px; right:12px; font-size:11px; padding:7px 12px; } .mehendi-carousel-btn{ padding:8px 12px; } }
 
   /* ---------- BEYOND THE VENUE ---------- */
   .side-grid{ display:grid; grid-template-columns:1fr 1fr; gap:32px; }
@@ -654,6 +662,7 @@
       <span class="mehendi-launcher-arrow" aria-hidden="true">→</span>
     </button>
   </div>
+  <div class="creative-gallery" id="creativeGallery" aria-live="polite"></div>
   </div>
 </section>
 
@@ -661,10 +670,7 @@
   <button class="mehendi-lightbox-close" id="mehendiLightboxClose" type="button">Close ×</button>
   <div class="mehendi-carousel"><img id="mehendiLightboxImg" src="" alt="Mehendi design, enlarged"><div class="mehendi-carousel-caption" id="mehendiCarouselCaption"></div><div class="mehendi-carousel-controls"><button class="mehendi-carousel-btn" id="mehendiPrev" type="button" aria-label="Previous design">← Prev</button><span class="mehendi-carousel-caption" id="mehendiCarouselCount"></span><button class="mehendi-carousel-btn" id="mehendiNext" type="button" aria-label="Next design">Next →</button></div></div>
 </div>
-<div class="mehendi-lightbox" id="creativeLightbox" role="dialog" aria-modal="true" aria-label="Creative works gallery">
-  <button class="mehendi-lightbox-close" id="creativeLightboxClose" type="button">Close ×</button>
-  <div class="mehendi-carousel"><img id="creativeLightboxImg" src="" alt="Creative work, enlarged"><div class="mehendi-carousel-caption" id="creativeCarouselCaption"></div><div class="mehendi-carousel-controls"><button class="mehendi-carousel-btn" id="creativePrev" type="button" aria-label="Previous creative work">← Prev</button><span class="mehendi-carousel-caption" id="creativeCarouselCount"></span><button class="mehendi-carousel-btn" id="creativeNext" type="button" aria-label="Next creative work">Next →</button></div></div>
-</div>
+
 
 <section id="beyond">
   <div class="wrap">
@@ -821,7 +827,22 @@
     });
   }
   setupGallery({ launcher:'mehendiLauncher', lightbox:'mehendiLightbox', image:'mehendiLightboxImg', close:'mehendiLightboxClose', caption:'mehendiCarouselCaption', count:'mehendiCarouselCount', prev:'mehendiPrev', next:'mehendiNext', items:mehendiDesigns, alt:'Mehendi design' });
-  setupGallery({ launcher:'creativeLauncher', lightbox:'creativeLightbox', image:'creativeLightboxImg', close:'creativeLightboxClose', caption:'creativeCarouselCaption', count:'creativeCarouselCount', prev:'creativePrev', next:'creativeNext', items:creativeWorks, alt:'Creative work' });
+
+  const creativeLauncher = document.getElementById('creativeLauncher');
+  const creativeGallery = document.getElementById('creativeGallery');
+  if (creativeLauncher && creativeGallery) {
+    creativeLauncher.addEventListener('click', function(){
+      creativeGallery.classList.toggle('is-visible');
+      if (!creativeWorks.length) {
+        creativeGallery.innerHTML = '<div class="mehendi-empty">Images coming soon — add them to the creative folder.</div>';
+        return;
+      }
+      creativeGallery.innerHTML = '<div class="creative-gallery-grid">' + creativeWorks.map(function(item){
+        return '<figure class="creative-gallery-item"><img src="' + item.image + '" alt="' + (item.caption || 'Creative work') + '">' + (item.caption ? '<figcaption class="creative-gallery-caption">' + item.caption + '</figcaption>' : '') + '</figure>';
+      }).join('') + '</div>';
+      if (creativeGallery.classList.contains('is-visible')) creativeGallery.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  }
 </script>
 
 </body>
