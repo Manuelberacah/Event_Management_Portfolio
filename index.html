@@ -374,7 +374,16 @@
   .mehendi-empty{ font-family:var(--mono); font-size:13px; color:var(--grey-dim); border:1px dashed var(--line); padding:40px; text-align:center; letter-spacing:0.04em; }
   .mehendi-lightbox-close{ position:absolute; top:20px; right:24px; font-family:var(--mono); font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--paper); background:transparent; border:1px solid var(--line); border-radius:var(--radius); padding:9px 16px; cursor:pointer; }
   .mehendi-lightbox-close:hover{ color:var(--amber); border-color:var(--amber); }
+  .mehendi-gallery-item{ cursor:zoom-in; }
+  .mehendi-gallery-item button{ display:block; width:100%; border:0; padding:0; background:transparent; cursor:zoom-in; color:inherit; text-align:left; }
+  .mehendi-image-viewer{ position:fixed; inset:0; z-index:1100; background:rgba(20,21,31,0.98); display:flex; align-items:center; justify-content:center; padding:72px 56px 48px; opacity:0; pointer-events:none; transition:opacity 0.2s ease; }
+  .mehendi-image-viewer.is-open{ opacity:1; pointer-events:auto; }
+  .mehendi-image-viewer img{ max-width:min(1100px, 92vw); max-height:78vh; width:auto; height:auto; object-fit:contain; border:1px solid var(--line); box-shadow:0 24px 70px rgba(0,0,0,0.45); }
+  .mehendi-image-viewer-caption{ position:absolute; left:50%; bottom:22px; transform:translateX(-50%); max-width:calc(100% - 40px); font-family:var(--mono); font-size:11px; color:var(--grey); letter-spacing:0.06em; text-transform:uppercase; text-align:center; }
+  .mehendi-image-viewer-close{ position:absolute; top:20px; right:24px; font-family:var(--mono); font-size:13px; letter-spacing:0.08em; text-transform:uppercase; color:var(--paper); background:transparent; border:1px solid var(--line); border-radius:var(--radius); padding:9px 16px; cursor:pointer; }
+  .mehendi-image-viewer-close:hover{ color:var(--amber); border-color:var(--amber); }
   @media (max-width:650px){ .mehendi-gallery-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+  @media (max-width:480px){ .mehendi-image-viewer{ padding:64px 14px 56px; } .mehendi-image-viewer-close{ top:12px; right:12px; font-size:11px; padding:7px 12px; } }
   @media (max-width:480px){ .mehendi-launcher{ padding:22px; } .mehendi-lightbox{ padding:64px 14px 24px; } .mehendi-lightbox-close{ top:12px; right:12px; font-size:11px; padding:7px 12px; } .mehendi-gallery-heading{ display:block; } .mehendi-gallery-count{ display:block; margin-top:8px; } }
 
   /* ---------- BEYOND THE VENUE ---------- */
@@ -674,6 +683,11 @@
   </div>
 </div>
 
+<div class="mehendi-image-viewer" id="mehendiImageViewer" role="dialog" aria-modal="true" aria-label="Full size gallery image">
+  <button class="mehendi-image-viewer-close" id="mehendiImageViewerClose" type="button">Close ×</button>
+  <img id="mehendiImageViewerImage" src="" alt="">
+  <p class="mehendi-image-viewer-caption" id="mehendiImageViewerCaption"></p>
+</div>
 
 <section id="beyond">
   <div class="wrap">
@@ -795,7 +809,11 @@
     const title = document.getElementById('mehendiGalleryTitle');
     const count = document.getElementById('mehendiGalleryCount');
     const close = document.getElementById('mehendiLightboxClose');
-    if (!launcher || !lightbox || !grid || !title || !count || !close) return;
+    const imageViewer = document.getElementById('mehendiImageViewer');
+    const imageViewerImage = document.getElementById('mehendiImageViewerImage');
+    const imageViewerCaption = document.getElementById('mehendiImageViewerCaption');
+    const imageViewerClose = document.getElementById('mehendiImageViewerClose');
+    if (!launcher || !lightbox || !grid || !title || !count || !close || !imageViewer || !imageViewerImage || !imageViewerCaption || !imageViewerClose) return;
 
     function renderGallery(){
       title.textContent = config.title;
@@ -804,17 +822,34 @@
         grid.innerHTML = '<div class="mehendi-empty">Images coming soon — add them to the ' + config.folder + ' folder.</div>';
         return;
       }
-      grid.innerHTML = config.items.map(function(item){
-        return '<figure class="mehendi-gallery-item"><img src="' + item.image + '" alt="' + (item.caption || config.alt) + '">' + (item.caption ? '<figcaption class="mehendi-gallery-caption">' + item.caption + '</figcaption>' : '') + '</figure>';
+      grid.innerHTML = config.items.map(function(item, index){
+        return '<figure class="mehendi-gallery-item"><button type="button" class="mehendi-gallery-image-button" data-gallery-index="' + index + '" aria-label="View ' + (item.caption || config.alt) + ' full size"><img src="' + item.image + '" alt="' + (item.caption || config.alt) + '"></button>' + (item.caption ? '<figcaption class="mehendi-gallery-caption">' + item.caption + '</figcaption>' : '') + '</figure>';
       }).join('');
+      grid.querySelectorAll('.mehendi-gallery-image-button').forEach(function(button){
+        button.addEventListener('click', function(){
+          const item = config.items[Number(button.dataset.galleryIndex)];
+          imageViewerImage.src = item.image;
+          imageViewerImage.alt = item.caption || config.alt;
+          imageViewerCaption.textContent = item.caption || '';
+          imageViewer.classList.add('is-open');
+          imageViewerClose.focus();
+        });
+      });
     }
     function open(){ activeGalleryLauncher = launcher; renderGallery(); lightbox.classList.add('is-open'); document.body.style.overflow = 'hidden'; close.focus(); }
-    function dismiss(){ lightbox.classList.remove('is-open'); grid.innerHTML = ''; document.body.style.overflow = ''; if (activeGalleryLauncher) activeGalleryLauncher.focus(); activeGalleryLauncher = null; }
+    function dismissImage(){ imageViewer.classList.remove('is-open'); imageViewerImage.src = ''; imageViewerCaption.textContent = ''; }
+    function dismiss(){ dismissImage(); lightbox.classList.remove('is-open'); grid.innerHTML = ''; document.body.style.overflow = ''; if (activeGalleryLauncher) activeGalleryLauncher.focus(); activeGalleryLauncher = null; }
     launcher.addEventListener('click', open);
     if (!lightbox.dataset.galleryBound) {
       close.addEventListener('click', dismiss);
+      imageViewerClose.addEventListener('click', dismissImage);
+      imageViewer.addEventListener('click', function(e){ if (e.target === imageViewer) dismissImage(); });
       lightbox.addEventListener('click', function(e){ if (e.target === lightbox) dismiss(); });
       document.addEventListener('keydown', function(e){
+        if (imageViewer.classList.contains('is-open')) {
+          if (e.key === 'Escape') dismissImage();
+          return;
+        }
         if (!lightbox.classList.contains('is-open')) return;
         if (e.key === 'Escape') dismiss();
       });
